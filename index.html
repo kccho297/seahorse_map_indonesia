@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <title>Seahorse map in Indonesia</title>
+  <title>seahorse map in Indonesia</title>
 
   <style>
     html,
@@ -12,25 +12,103 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Custom legend */
+    #legend {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 10;
+      min-width: 200px;
+    }
+
+    #legend h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-right: 10px;
+      border: 1px solid #444;
+    }
+
+    .red { background: red; }
+    .green { background: green; }
+    .purple { background: purple; }
+    .blue { background: blue; }
+
+    /* Layer list styling */
+    arcgis-layer-list {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      padding: 8px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      max-height: 80vh;
+      overflow: auto;
+      z-index: 10;
     }
   </style>
 
   <!-- ArcGIS Maps SDK -->
   <script type="module" src="https://js.arcgis.com/5.0/"></script>
-
 </head>
 
 <body>
 
   <arcgis-map item-id="3e20ab9415a540b1878cae4aa8679529">
 
-    <!-- Zoom widget -->
+    <!-- Zoom control -->
     <arcgis-zoom slot="top-left"></arcgis-zoom>
 
-    <!-- Layer toggle panel -->
-    <arcgis-layer-list slot="top-left"></arcgis-layer-list>
+    <!-- Always visible layer list (NOT collapsed) -->
+    <arcgis-layer-list slot="top-right"></arcgis-layer-list>
 
   </arcgis-map>
+
+  <!-- Custom Legend -->
+  <div id="legend">
+
+    <h3>Legend</h3>
+
+    <div class="legend-item">
+      <div class="legend-color red"></div>
+      <span>Fishing Ground</span>
+    </div>
+
+    <div class="legend-item">
+      <div class="legend-color green"></div>
+      <span>Specimen</span>
+    </div>
+
+    <div class="legend-item">
+      <div class="legend-color purple"></div>
+      <span>TCM Trade</span>
+    </div>
+
+    <div class="legend-item">
+      <div class="legend-color blue"></div>
+      <span>Sighting</span>
+    </div>
+
+  </div>
 
 </body>
 
