@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -12,45 +13,84 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8f9fa;
     }
 
-    /* Custom legend */
+    /* Modernized Legend Container */
     #legend {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
-      background: white;
-      padding: 12px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      bottom: 24px;
+      right: 24px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.06);
       z-index: 10;
-      min-width: 200px;
+      min-width: 220px;
     }
 
     #legend h3 {
-      margin: 0 0 10px 0;
-      font-size: 16px;
+      margin: 0 0 14px 0;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #2c3e50;
+      border-bottom: 1px solid #edf2f7;
+      padding-bottom: 8px;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #4a5568;
     }
 
+    .legend-item:last-child {
+      margin-bottom: 2px;
+    }
+
+    /* Marker shapes */
     .legend-color {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      margin-right: 10px;
-      border: 1px solid #444;
+      flex-shrink: 0;
+      margin-right: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
     }
 
-    .red { background: red; }
-    .green { background: green; }
-    .purple { background: purple; }
-    .blue { background: blue; }
+    /* Point Markers (Circles) */
+    .circle {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    /* Polygon Markers (Rectangles) */
+    .polygon {
+      width: 18px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    /* Point Colors */
+    .red { background: #e53e3e; }
+    .green { background: #38a169; }
+    .purple { background: #805ad5; }
+    .blue { background: #3182ce; }
+
+    /* Polygon Colors & Fills */
+    .coast-buffer { 
+      background: rgba(76, 129, 205, 0.4); 
+      border: 1.5px dashed #4c81cd;
+    }
+    .seahorse-range { 
+      background: rgba(76, 205, 117, 0.4); 
+      border: 1.5px solid #4ccd75;
+    }
 
     /* Layer list styling */
     arcgis-layer-list {
@@ -73,13 +113,13 @@
 
 <body>
 
-  <arcgis-map item-id="3e20ab9415a540b1878cae4aa8679529">
+  <arcgis-map id="mapView" item-id="3e20ab9415a540b1878cae4aa8679529">
 
     <!-- Zoom control -->
     <arcgis-zoom slot="top-left"></arcgis-zoom>
 
-    <!-- Always visible layer list (NOT collapsed) -->
-    <arcgis-layer-list slot="top-right"></arcgis-layer-list>
+    <!-- Layer list container -->
+    <arcgis-layer-list id="layerList" slot="top-right"></arcgis-layer-list>
 
   </arcgis-map>
 
@@ -87,28 +127,64 @@
   <div id="legend">
 
     <h3>Legend</h3>
-
+    
     <div class="legend-item">
-      <div class="legend-color red"></div>
+      <div class="legend-color circle red"></div>
       <span>Fishing Ground</span>
     </div>
 
     <div class="legend-item">
-      <div class="legend-color green"></div>
+      <div class="legend-color circle green"></div>
       <span>Specimen</span>
     </div>
 
     <div class="legend-item">
-      <div class="legend-color purple"></div>
+      <div class="legend-color circle purple"></div>
       <span>TCM Trade</span>
     </div>
 
     <div class="legend-item">
-      <div class="legend-color blue"></div>
+      <div class="legend-color circle blue"></div>
       <span>Sighting</span>
     </div>
 
+    <div class="legend-item">
+      <div class="legend-color polygon coast-buffer"></div>
+      <span>Coastal Buffer</span>
+    </div>
+
+    <div class="legend-item">
+      <div class="legend-color polygon seahorse-range"></div>
+      <span>Seahorse Range</span>
+    </div>
+
   </div>
+
+  <script type="module">
+    const mapElement = document.getElementById("mapView");
+    const layerListElement = document.getElementById("layerList");
+
+    mapElement.addEventListener("arcgisViewReadyChange", async (event) => {
+      const view = event.target.view;
+      
+      if (view && view.map) {
+        layerListElement.view = view;
+
+        // Wait for map layers to load completely to look for any group types
+        await view.map.when();
+
+        // Loop through operational layers to find group layers and completely hide their internal children
+        view.map.layers.forEach((layer) => {
+          if (layer.type === "group") {
+            layer.layers.forEach((sublayer) => {
+              // Setting listMode to "hide" completely removes the sublayer from the UI list tree
+              sublayer.listMode = "hide";
+            });
+          }
+        });
+      }
+    });
+  </script>
 
 </body>
 
